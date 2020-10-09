@@ -1,11 +1,17 @@
 <template>
   <div>
     <p>{{ defaultText }}</p>
+    <Twitch />
   </div>
 </template>
 
 <script>
+import Twitch from './Twitch.vue';
+
 export default {
+  components: {
+    Twitch
+  },
   name: 'HelloWorld',
   mounted () {
     browser.runtime.sendMessage({})
