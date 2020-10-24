@@ -1,5 +1,22 @@
 <template>
   <div>
+    <div v-if="bonusData" style="margin-bottom: 1em;">
+      <h5 style="margin-bottom:.5em">Bonuses collected</h5>
+      <table>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(user, count) in bonusData" v-bind:key="user">
+            <th style="text-align: left;">{{ user }}</th>
+            <td style="text-align: left;">{{ count }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <button v-on:click="checkLogin">Check login status</button>
     
     <div v-if="loaded && isAuthenticated">
@@ -51,10 +68,12 @@ export default {
       userData: null,
       loaded: false,
       followedAccounts: null,
-      pointsData: null
+      pointsData: null,
+      bonusData: null
     }
   },
   mounted () {
+    chrome.storage.local.get('bonus_counter', storage => this.bonusData = storage.bonus_counter);
   },
   methods: {
     openLink (e) {

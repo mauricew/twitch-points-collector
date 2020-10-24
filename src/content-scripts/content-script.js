@@ -37,6 +37,17 @@ const loop = () => {
     console.info('Clicking the bonus button!');
     bonusButton.click();
     tpcEl.classList.add('tw-alert-banner--success');
+
+    const username = location.pathname.split('/')[0];
+
+    chrome.storage.local.get('bonus_counter', storage => {
+      const bonus_counter = {
+        ...storage.bonus_counter,
+        [username]: ((storage.bonus_counter.xqcow) || 0) + 1
+      };
+
+      chrome.storage.local.set({ bonus_counter }, () => console.log(bonus_counter));
+    });
     
     setTimeout(() => {
       tpcEl.classList.remove('tw-alert-banner--success', 'tw-strong');
