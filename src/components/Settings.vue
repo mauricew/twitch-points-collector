@@ -6,7 +6,7 @@
         </q-toolbar>
       </q-header>
     <q-page-container class="q-pa-md">
-      <q-page>
+      <q-page :style-fn="() => ({})">
         <div class="q-gutter-sm">
           <q-checkbox v-model="bonusCollectionEnabled" label="Enable automatic bonus collection" v-on:input="toggleCollection()" />
         </div>

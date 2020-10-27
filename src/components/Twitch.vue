@@ -10,7 +10,7 @@
         </q-toolbar>
       </q-header>
       <q-page-container class="q-pa-md">
-        <q-page>
+        <q-page :style-fn="() => ({})">
           <q-btn v-on:click="checkLogin">Check login status</q-btn>
           
           <div v-if="loaded && isAuthenticated">
