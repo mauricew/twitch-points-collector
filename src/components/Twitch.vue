@@ -1,36 +1,44 @@
 <template>
   <div>
-    <div v-if="bonusData" style="margin-bottom: 1em;">
-      <h5 style="margin-bottom:.5em">Bonuses collected</h5>
-      {{ bonusData }}
-    </div>
-    <button v-on:click="checkLogin">Check login status</button>
-    
-    <div v-if="loaded && isAuthenticated">
-      You're logged in as {{ this.userData.login }}
-      <button v-if="!followedAccounts" v-on:click="getFollowedAccounts">Get those follows bro</button>
-      <ul v-if="followedAccounts">
-        <li v-for="a in followedAccounts" v-bind:key="a.to_id">
-          {{a.to_name}}
-          <span v-if="pointsData && pointsData[a.to_id]">
-            <span v-if="pointsData[a.to_id].isPointsEnabled">
-              {{pointsData[a.to_id].yourPoints}} points
-            </span>
-            <em v-if="!pointsData[a.to_id].isPointsEnabled">
-              (points not enabled)
-            </em>
-            <strong v-if="bonusData && bonusData[a.to_name.toLowerCase()]">
-              {{bonusData[a.to_name.toLowerCase()]}} bonuses
-            </strong>
-          </span>
-        </li>
-      </ul>
-    </div>
-    <div v-if="loaded && !isAuthenticated">
-      Please log in at
-      <a rel="nofollow noreferrer noopener" href="https://www.twitch.tv/login" v-on:click="openLink">twitch.tv</a>
-      to continue.
-    </div>
+    <q-layout>
+      <q-header elevated>
+        <q-toolbar>
+          <q-toolbar-title>Twitch Points Collector</q-toolbar-title>
+          <q-btn flat round dense>
+            <q-icon name="settings" v-on:click="openSettings()"></q-icon>
+          </q-btn>
+        </q-toolbar>
+      </q-header>
+      <q-page-container class="q-pa-md">
+        <q-page>
+          <div v-if="bonusData" style="margin-bottom: 1em;">
+            <h5 style="margin: 1em 0;">Bonuses collected</h5>
+            {{ bonusData }}
+          </div>
+          <q-btn v-on:click="checkLogin">Check login status</q-btn>
+          
+          <div v-if="loaded && isAuthenticated">
+            You're logged in as {{ this.userData.login }}
+            <q-btn v-if="!followedAccounts" v-on:click="getFollowedAccounts">Get those follows bro</q-btn>
+            <q-spinner v-if="pointsDataLoading"
+              color="primary"
+              size="3em"></q-spinner>
+
+            <q-table v-if="pointsData"
+              :data="pointsData"
+              :columns="pointsColumns"
+              row-key="userId">
+            </q-table>
+           
+          </div>
+          <div v-if="loaded && !isAuthenticated">
+            Please log in at
+            <a rel="nofollow noreferrer noopener" href="https://www.twitch.tv/login" v-on:click="openLink">twitch.tv</a>
+            to continue.
+          </div>
+        </q-page>
+      </q-page-container>
+    </q-layout>
   </div>
 </template>
 
@@ -59,7 +67,13 @@ export default {
       loaded: false,
       followedAccounts: null,
       pointsData: null,
-      bonusData: null
+      bonusData: null,
+      pointsDataLoading: false,
+      pointsColumns: [
+        { name: 'channelName', field: 'channelName', align: 'center', label: 'Channel' },
+        { name: 'yourPoints', field: 'yourPoints', label: 'Points' },
+        { name: 'yourBonuses', field: 'yourBonuses', label: 'Bonuses' },
+      ]
     }
   },
   mounted () {
@@ -68,6 +82,9 @@ export default {
   methods: {
     openLink (e) {
       chrome.tabs.create({ url: e.target.href });
+    },
+    openSettings() {
+      chrome.runtime.openOptionsPage();
     },
     checkLogin () {
       chrome.storage.local.get('user_token', storage => {
@@ -100,6 +117,8 @@ export default {
         "Client-ID": CLIENT_ID
       };
 
+      this.pointsDataLoading = true;
+
       fetch(`https://api.twitch.tv/helix/users/follows?from_id=${this.userData.user_id}`, { credentials: "include", headers })
         .then(res => res.json())
         .then(res => {
@@ -122,19 +141,27 @@ export default {
             .then(res => {
               this.pointsData = res.map(c => {
                 const isPointsEnabled = c.data.community.channel.communityPointsSettings.isEnabled;
+                const channelName = c.data.community.displayName.toLowerCase()
 
                 let yourPoints;
+                let yourBonuses;
                 if (isPointsEnabled) {
                   yourPoints = c.data.community.channel.self.communityPoints.balance;
+
+                  if (this.bonusData && this.bonusData[channelName]) {
+                    yourBonuses = this.bonusData[channelName];
+                  }
                 }
                 
                 return {
-                  user_id: c.data.community.channel.id,
+                  userId: c.data.community.channel.id,
+                  channelName,
                   isPointsEnabled,
-                  yourPoints
+                  yourPoints,
+                  yourBonuses
                 }
-              })
-              .reduce((a, b) => ({ ...a, [b.user_id]: b}), {});              
+              });
+              this.pointsDataLoading = false;
             });
         });
     }

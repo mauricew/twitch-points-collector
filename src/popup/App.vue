@@ -1,17 +1,19 @@
 <template>
-  <hello-world />
+  <twitch />
 </template>
 
 <script>
-import HelloWorld from '@/components/HelloWorld.vue'
+import Twitch from '@/components/Twitch.vue'
 
 export default {
   name: 'App',
-  components: { HelloWorld }
+  components: { Twitch }
 }
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons');
+
 html {
   width: 400px;
   height: 400px;
