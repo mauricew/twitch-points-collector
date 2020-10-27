@@ -32,21 +32,23 @@ const loop = () => {
     //pointsContainer.parentElement.appendChild(popupEl);
   }
 
+  const stor = chrome.storage;
+
   const bonusButton = pointsContainer.querySelector('.tw-button.tw-button--success');
   if (bonusButton) {
     console.info('Clicking the bonus button!');
     bonusButton.click();
     tpcEl.classList.add('tw-alert-banner--success');
 
-    const username = location.pathname.split('/')[0];
+    const username = location.pathname.split('/')[1];
 
-    chrome.storage.local.get('bonus_counter', storage => {
+    stor.local.get('bonus_counter', storage => {
       const bonus_counter = {
         ...storage.bonus_counter,
-        [username]: ((storage.bonus_counter.xqcow) || 0) + 1
+        [username]: ((storage.bonus_counter[username]) || 0) + 1
       };
 
-      chrome.storage.local.set({ bonus_counter }, () => console.log(bonus_counter));
+      stor.local.set({ bonus_counter }, () => console.log(bonus_counter));
     });
     
     setTimeout(() => {

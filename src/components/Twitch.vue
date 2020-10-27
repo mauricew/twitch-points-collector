@@ -2,20 +2,7 @@
   <div>
     <div v-if="bonusData" style="margin-bottom: 1em;">
       <h5 style="margin-bottom:.5em">Bonuses collected</h5>
-      <table>
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Count</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(user, count) in bonusData" v-bind:key="user">
-            <th style="text-align: left;">{{ user }}</th>
-            <td style="text-align: left;">{{ count }}</td>
-          </tr>
-        </tbody>
-      </table>
+      {{ bonusData }}
     </div>
     <button v-on:click="checkLogin">Check login status</button>
     
@@ -32,6 +19,9 @@
             <em v-if="!pointsData[a.to_id].isPointsEnabled">
               (points not enabled)
             </em>
+            <strong v-if="bonusData && bonusData[a.to_name.toLowerCase()]">
+              {{bonusData[a.to_name.toLowerCase()]}} bonuses
+            </strong>
           </span>
         </li>
       </ul>
