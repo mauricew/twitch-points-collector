@@ -11,10 +11,6 @@
       </q-header>
       <q-page-container class="q-pa-md">
         <q-page>
-          <div v-if="bonusData" style="margin-bottom: 1em;">
-            <h5 style="margin: 1em 0;">Bonuses collected</h5>
-            {{ bonusData }}
-          </div>
           <q-btn v-on:click="checkLogin">Check login status</q-btn>
           
           <div v-if="loaded && isAuthenticated">

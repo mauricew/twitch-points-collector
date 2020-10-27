@@ -15,6 +15,12 @@ browser.storage.local.get('bonus_counter').then(storage => {
   }
 });
 
+browser.storage.local.get('bonus_collection_enabled').then(storage => {
+  if (typeof(storage.bonus_collection_enabled) === 'undefined') {
+    browser.storage.local.set({ bonus_collection_enabled: true });
+  }
+});
+
 browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request && request.action === 'ping') {
     console.info('pong');
